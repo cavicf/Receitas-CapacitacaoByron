@@ -1,8 +1,8 @@
 
 export default function Home() {
   return (
-    <div>
+    <main className="flex-grow">
       <h1>Configuração inicial</h1>
-    </div>
+    </main>
   );
 }
