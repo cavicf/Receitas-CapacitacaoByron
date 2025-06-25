@@ -1,4 +1,5 @@
 import InfoPill from "@/components/infoPill";
+import PreparationStep from "@/components/PreparationStep";
 import { Recipe, recipes } from "@/lib/data";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
@@ -25,7 +26,7 @@ export default function ReceitaPage({params}: RecipePageProps){
                     Voltar para receitas
                 </Link>
 
-                <section className="rounded-lg overflow-hidden shadow-md">
+                <section className="rounded-lg overflow-hidden border border-slate-200 shadow-md">
                     <div className="relative h-96 w-full">
                         <Image
                             src={recipe.image}
@@ -51,14 +52,17 @@ export default function ReceitaPage({params}: RecipePageProps){
                                 <h2 className="text-xl font-bold mb-4">Ingredientes</h2>
                                 <ul className="list-disc list-inside space-y-2">
                                     {recipe.ingredients.map((ingredient)=>(
-                                        <li className="marker:text-orange-500">{ingredient}</li>
+                                        <li key={ingredient} className="marker:text-orange-500">{ingredient}</li>
                                     ))}
                                 </ul>
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold mb-4">Modo de preparo</h2>
-                                {/* coluna de preparo */}
-                                {/* TODO: componente de passo de preparo */}
+                                <ol className="space-y-4">
+                                    {recipe.instructions.map((instruction, index)=> (
+                                        <PreparationStep key={instruction} index={index + 1} description={instruction}/>
+                                    ))}
+                                </ol>
                             </div>
                         </div>
                     </div>
