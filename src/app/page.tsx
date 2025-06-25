@@ -1,7 +1,10 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { recipes } from "@/lib/data";
+import RecipeCard from "@/components/RecipeCard";
 
 export default function Home() {
+  const featureRecipes = recipes.slice(0,3);
   return (
     <main className="flex-grow">
         <section className="bg-orange-50 py-12">
@@ -13,9 +16,13 @@ export default function Home() {
         </section>
 
         <section className="py-12">
-          <div className="flex flex-col items-center container mx-auto">
-            <h2 className="text-lg font-bold">Receitas em destaque</h2>
-            {/*TODO:cards de receita*/}
+          <div className="flex flex-col items-center container mx-auto gap-8">
+            <h2 className="text-xl font-bold">Receitas em destaque</h2>
+            <div className="flex w-full gap-8">
+              {featureRecipes.map((recipe)=> (
+                <RecipeCard key={recipe.id} recipe={recipe}/>
+              ))}
+            </div>
             <Link className="flex text-orange-300 hover:text-orange-600 transition-colors" href='/receitas'>
               Ver todas as receitas
               <ChevronRight/>
