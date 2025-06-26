@@ -18,7 +18,7 @@ export default function Home() {
         <section className="py-12">
           <div className="flex flex-col items-center container mx-auto gap-8">
             <h2 className="text-xl font-bold">Receitas em destaque</h2>
-            <div className="flex flex-col lg:flex-row w-full gap-8">
+            <div className="flex flex-col items-center lg:flex-row w-full gap-8">
               {featureRecipes.map((recipe)=> (
                 <RecipeCard key={recipe.id} recipe={recipe}/>
               ))}
