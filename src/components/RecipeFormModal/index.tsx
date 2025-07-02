@@ -1,6 +1,6 @@
 import { RecipeFormData, recipeSchema } from "@/lib/formValidationSchemas/recipeSchema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Span } from "next/dist/trace";
 
@@ -10,28 +10,62 @@ interface RecipeFormModalProps{
     onClose: () => void
 }
 
+const DEFAULT_VALUES: RecipeFormData = {
+    title: '',
+    category: '',
+    description: '',
+    imageURL: '',
+    prepTime: '',
+    cookTime: '',
+    servings: 1,
+    ingredients: [{value: ''}],
+    instructions: [{value: ''}],
+}
+
 export default function RecipeFormModal({isOpen, onClose}: RecipeFormModalProps) {
     const {
         register,
         reset,
         handleSubmit,
-        formState: {errors}
+        formState: {errors},
+        control
 } = useForm<RecipeFormData>({
     resolver: yupResolver(recipeSchema),
-    mode: "onSubmit"
+    mode: "onSubmit",
+    defaultValues: DEFAULT_VALUES
 })
 
-    const onSubmit = (data: RecipeFormData) => {
-        console.log(data)
-        reset()
-        onClose()
-    }
-    
-    const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow'
+const {
+    fields: ingredientFields,
+    append: appendIngredients,
+    remove: removeIngredients
+} = useFieldArray({
+    control,
+    name: 'ingredients'
+})
+
+const {
+    fields: instructionFields,
+    append: appendInstructionss,
+    remove: removeInstructionss
+} = useFieldArray({
+    control,
+    name: 'instructions'
+})
+
+const onSubmit = (data: RecipeFormData) => {
+    console.log(data)
+    reset()
+    onClose()
+}
+
+
+
+const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow'
     
     return(
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="bg-white">
+            <DialogContent className="bg-white lg:min-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Nova Receita</DialogTitle>
                 </DialogHeader>
@@ -85,13 +119,15 @@ export default function RecipeFormModal({isOpen, onClose}: RecipeFormModalProps)
 
                     {/* Lista de Ingredientes */}
                     <div className="flex flex-col gap-1">
-                        <div className="flex flex-col gap-1">
                             <label htmlFor="ingredients">Ingredientes</label>
-                            <div className="flex gap-2">
-                                <input type="text" id="ingredients" className={inputStyle}/>
-                                <button type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md">Remover</button>
-                            </div>
-                            <button type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit w-fit">Adicionar Ingrediente</button>
+                            <div className="flex flex-col gap-1">
+                            {ingredientFields.map((field, index)=>(
+                                <div key={field.id} className="flex gap-2">
+                                    <input type="text" id="ingredients" placeholder="Digite um ingrediente" className={inputStyle} {...register(`ingredients.${index}.value`)}/>
+                                    {ingredientFields.length> 1 &&<button type="button" onClick={() => removeIngredients(index)} className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md">Remover</button>}
+                                </div>
+                            ))}
+                            <button type="button" onClick={()=> appendIngredients({value:''})} className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit w-fit">Adicionar Ingrediente</button>
                         </div>
                     </div>
 
@@ -99,11 +135,13 @@ export default function RecipeFormModal({isOpen, onClose}: RecipeFormModalProps)
                     <div className="flex flex-col gap-1">
                         <label htmlFor="instructions">Instruções</label>
                         <div className="flex flex-col gap-1">
-                            <div className="flex gap-2">
-                                <textarea id="instructions" className={inputStyle}/>
-                                <button type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit">Remover</button>
-                            </div>
-                            <button type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit w-fit">Adicionar Instrução</button>
+                        {instructionFields.map((field, index)=>(
+                                <div key={field.id} className="flex gap-2">
+                                    <textarea id="instructions" placeholder="Digite uma instrução" className={inputStyle} {...register(`instructions.${index}.value`)}/>
+                                    {instructionFields.length> 1 &&<button onClick={() => removeInstructionss(index)} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit">Remover</button>}
+                                </div>
+                            ))}
+                            <button onClick={() => appendInstructionss({value: ''})} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit w-fit">Adicionar Instrução</button>
                         </div>
                     </div>
 

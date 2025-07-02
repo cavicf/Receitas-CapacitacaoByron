@@ -11,7 +11,7 @@ export default function ReceitasPage(){
     return (
         <main className="flex-grow py-8">
             <div className="container mx-auto">
-                <div className="flex justify-between w-full">
+                <div className="flex flex-col items-center gap-4 lg:gap-0 lg:flex-row lg:justify-between w-full">
                     <h1 className="text-3xl font-bold text-center lg:text-left">Todas as Receitas</h1>
                     <button onClick={() => setIsRecipeModalOpen(true)} className="flex items-center gap-2 bg-black text-white px-4 py-2 border rounded-lg hover:bg-gray-800 trasition-colors">
                         <Plus className="size={16"/>
