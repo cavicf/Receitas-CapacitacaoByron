@@ -54,18 +54,23 @@ const {
 })
 
 const onSubmit = (data: RecipeFormData) => {
-    console.log(data)
+    const recipeData = {
+        ...data,
+        ingredients: data.ingredients.map((ingredient) => ingredient.value),
+        instructions: data.instructions.map((instructions) => instructions.value)
+    }
+    console.log(recipeData)
     reset()
     onClose()
 }
 
 
 
-const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow'
+const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow w-full'
     
     return(
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="bg-white lg:min-w-2xl">
+            <DialogContent className="bg-white lg:min-w-2xl max-h-[90dvh] overflow-y-scroll">
                 <DialogHeader>
                     <DialogTitle>Nova Receita</DialogTitle>
                 </DialogHeader>
@@ -123,7 +128,10 @@ const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow'
                             <div className="flex flex-col gap-1">
                             {ingredientFields.map((field, index)=>(
                                 <div key={field.id} className="flex gap-2">
-                                    <input type="text" id="ingredients" placeholder="Digite um ingrediente" className={inputStyle} {...register(`ingredients.${index}.value`)}/>
+                                    <div className="flex-grow">
+                                        <input type="text" id="ingredients" placeholder="Digite um ingrediente" className={inputStyle} {...register(`ingredients.${index}.value`)}/>
+                                        {errors.ingredients?.[index]?.value && <span className="text-sm text-red-500" >{errors.ingredients?.[index]?.value.message}</span>}
+                                    </div>
                                     {ingredientFields.length> 1 &&<button type="button" onClick={() => removeIngredients(index)} className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md">Remover</button>}
                                 </div>
                             ))}
@@ -137,7 +145,10 @@ const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow'
                         <div className="flex flex-col gap-1">
                         {instructionFields.map((field, index)=>(
                                 <div key={field.id} className="flex gap-2">
-                                    <textarea id="instructions" placeholder="Digite uma instrução" className={inputStyle} {...register(`instructions.${index}.value`)}/>
+                                    <div className="flex-grow">
+                                        <textarea id="instructions" placeholder="Digite uma instrução" className={inputStyle} {...register(`instructions.${index}.value`)}/>
+                                        {errors.ingredients?.[index]?.value && <span className="text-sm text-red-500" >{errors.ingredients?.[index]?.value.message}</span>}
+                                    </div>
                                     {instructionFields.length> 1 &&<button onClick={() => removeInstructionss(index)} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit">Remover</button>}
                                 </div>
                             ))}
