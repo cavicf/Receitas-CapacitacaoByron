@@ -1,15 +1,18 @@
+'use client'
 import { Recipe } from "@/lib/data";
 import { Edit, Trash, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-interface RecipeCarsProps{
+interface RecipeCardProps{
     recipe: Recipe
+    onEdit: () => void
 }
 
-export default function RecipeCard({recipe}: RecipeCarsProps){
+export default function RecipeCard({recipe, onEdit}: RecipeCardProps){
     const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
+        onEdit()
         
     }
 

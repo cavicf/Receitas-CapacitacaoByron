@@ -4,12 +4,15 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Span } from "next/dist/trace";
 import { Recipe } from "@/lib/data";
+import { useEffect } from "react";
 
 
-interface RecipeFormModalProps{
+interface RecipeFormModalProps {
     isOpen: boolean;
-    onClose: () => void
-    onSave: (recipe: Omit<Recipe, 'id'>) => void
+    onClose: () => void;
+    onSave: (recipe: Omit<Recipe, "id"> | Recipe) => void;
+    mode: "create" | "edit";
+    recipe?: Recipe;
 }
 
 const DEFAULT_VALUES: RecipeFormData = {
@@ -27,7 +30,9 @@ const DEFAULT_VALUES: RecipeFormData = {
 export default function RecipeFormModal({
     isOpen, 
     onClose,
-    onSave
+    onSave,
+    mode,
+    recipe
 }: RecipeFormModalProps) {
     const {
         register,
@@ -44,20 +49,33 @@ export default function RecipeFormModal({
 const {
     fields: ingredientFields,
     append: appendIngredients,
-    remove: removeIngredients
+    remove: removeIngredients,
 } = useFieldArray({
     control,
-    name: 'ingredients'
+    name: 'ingredients',
 })
 
 const {
     fields: instructionFields,
-    append: appendInstructionss,
-    remove: removeInstructionss
+    append: appendInstructions,
+    remove: removeInstructions,
 } = useFieldArray({
     control,
-    name: 'instructions'
+    name: 'instructions',
 })
+
+useEffect(() => {
+    if (mode === 'edit' && recipe) {
+        reset({
+            ...recipe,
+            ingredients: recipe.ingredients.map((ing) => ({ value: ing })),
+            instructions: recipe.instructions.map((inst) => ({ value: inst }))
+        })
+    } else {
+        reset(DEFAULT_VALUES)
+    }
+}, [mode, isOpen, recipe, reset])
+
 
 const onSubmit = (data: RecipeFormData) => {
     const recipeData = {
@@ -66,7 +84,7 @@ const onSubmit = (data: RecipeFormData) => {
         instructions: data.instructions.map((instructions) => instructions.value)
     }
     console.log(recipeData)
-    onSave(recipeData)
+    onSave(mode === 'edit' && recipe ? {...recipeData, id: recipe.id} : recipeData)
     reset()
     onClose()
 }
@@ -79,7 +97,7 @@ const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow w-full'
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="bg-white lg:min-w-2xl max-h-[90dvh] overflow-y-scroll">
                 <DialogHeader>
-                    <DialogTitle>Nova Receita</DialogTitle>
+                    <DialogTitle>{mode === 'create' ? "Nova receita" : 'Editar receita'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
                     <div className="grid grid-cols-2 gap-2">
@@ -156,16 +174,16 @@ const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow w-full'
                                         <textarea id="instructions" placeholder="Digite uma instrução" className={inputStyle} {...register(`instructions.${index}.value`)}/>
                                         {errors.ingredients?.[index]?.value && <span className="text-sm text-red-500" >{errors.ingredients?.[index]?.value.message}</span>}
                                     </div>
-                                    {instructionFields.length> 1 &&<button onClick={() => removeInstructionss(index)} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit">Remover</button>}
+                                    {instructionFields.length> 1 &&<button onClick={() => removeInstructions(index)} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit">Remover</button>}
                                 </div>
                             ))}
-                            <button onClick={() => appendInstructionss({value: ''})} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit w-fit">Adicionar Instrução</button>
+                            <button onClick={() => appendInstructions({value: ''})} type="button" className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md h-fit w-fit">Adicionar Instrução</button>
                         </div>
                     </div>
 
                     <div className="flex gap-2 self-end">
                         <button type="button" onClick={onClose} className="bg-white border border-zinc-300 rounded-md hover:bg-gray-200 transition-colors px-4 py-2 text-md">Cancelar</button>
-                        <button type="submit" className="bg-black rounded-md hover:bg-gray-800 text-white transition-colors px-4 py-2 text-md">Criar Receita</button>
+                        <button type="submit" className="bg-black rounded-md hover:bg-gray-800 text-white transition-colors px-4 py-2 text-md">{mode === 'create' ? "Criar receita" : 'Editar receita'}</button>
                     </div>
                 </form>
             </DialogContent>
