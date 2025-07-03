@@ -1,5 +1,6 @@
 'use client'
 
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
 import RecipeCard from "@/components/RecipeCard";
 import RecipeFormModal from "@/components/RecipeFormModal";
 import { recipes as initialRecipes } from "@/lib/data";
@@ -12,6 +13,20 @@ export default function ReceitasPage(){
     const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
     const [modalMode, setModalMode] = useState<'create'|'edit'>('create')
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe|undefined>(undefined)
+    const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useState(false)
+
+    const handleOpenDeleteConfirmationModal = (recipe: Recipe) => {
+        setSelectedRecipe(recipe);
+        setIsDeleteConfirmationModalOpen(true)
+    }
+    
+    const handleDeleteRecipe = () => {
+        if(selectedRecipe){
+            setRecipes((prev) => prev.filter((recipe)=> recipe.id !== selectedRecipe.id))
+            setIsDeleteConfirmationModalOpen(false)
+            setSelectedRecipe(undefined)
+        }
+    }
 
     const handleOpenCreateModal =() => {
         setModalMode('create')
@@ -19,7 +34,7 @@ export default function ReceitasPage(){
         setIsRecipeModalOpen(true)
     }
 
-    const handleOpemEditModal = (recipe: Recipe) => {
+    const handleOpenEditModal = (recipe: Recipe) => {
         setModalMode('edit')
         setSelectedRecipe(recipe)
         setIsRecipeModalOpen(true)
@@ -54,11 +69,13 @@ export default function ReceitasPage(){
                 </div>
                 <div className="grid justify-center sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
                     {recipes.map((recipe)=> (
-                        <RecipeCard key={recipe.id} recipe={recipe} onEdit={() => handleOpemEditModal(recipe)}/>
+                        <RecipeCard key={recipe.id} recipe={recipe} onEdit={() => handleOpenEditModal(recipe)} onDelete={() => handleOpenDeleteConfirmationModal(recipe)}/>
                     ))}
                 </div>
             </div>
             <RecipeFormModal isOpen={isRecipeModalOpen} onClose={handleCloseModal} onSave={handleSaveRecipe} mode={modalMode} recipe={selectedRecipe}/>
+
+            <DeleteConfirmationModal isOpen={isDeleteConfirmationModalOpen} onClose={() => setIsDeleteConfirmationModalOpen(false)} onConfirm={handleDeleteRecipe} recipe={selectedRecipe}/>
         </main>
     );
 }

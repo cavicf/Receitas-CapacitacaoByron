@@ -7,18 +7,18 @@ import Link from "next/link";
 interface RecipeCardProps{
     recipe: Recipe
     onEdit: () => void
+    onDelete: () => void
 }
 
-export default function RecipeCard({recipe, onEdit}: RecipeCardProps){
+export default function RecipeCard({recipe, onEdit, onDelete}: RecipeCardProps){
     const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        onEdit()
-        
+        onEdit()   
     }
 
     const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-    
+        onDelete()
     }
 
     return (
