@@ -9,7 +9,7 @@ interface RecipeCarsProps{
 export default function RecipeCard({recipe}: RecipeCarsProps){
     return (
         <Link href={`/receitas/${recipe.id}`}>
-            <div className="border border-slate-200 rounded-xl w-3xs lg:w-auto overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div className="border border-slate-200 rounded-xl w-3xs lg:w-full overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="relative h-48 w-full">
                     <Image
                         src={recipe.image}

@@ -3,18 +3,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Span } from "next/dist/trace";
+import { Recipe } from "@/lib/data";
 
 
 interface RecipeFormModalProps{
     isOpen: boolean;
     onClose: () => void
+    onSave: (recipe: Omit<Recipe, 'id'>) => void
 }
 
 const DEFAULT_VALUES: RecipeFormData = {
     title: '',
     category: '',
     description: '',
-    imageURL: '',
+    image: '',
     prepTime: '',
     cookTime: '',
     servings: 1,
@@ -22,7 +24,11 @@ const DEFAULT_VALUES: RecipeFormData = {
     instructions: [{value: ''}],
 }
 
-export default function RecipeFormModal({isOpen, onClose}: RecipeFormModalProps) {
+export default function RecipeFormModal({
+    isOpen, 
+    onClose,
+    onSave
+}: RecipeFormModalProps) {
     const {
         register,
         reset,
@@ -60,6 +66,7 @@ const onSubmit = (data: RecipeFormData) => {
         instructions: data.instructions.map((instructions) => instructions.value)
     }
     console.log(recipeData)
+    onSave(recipeData)
     reset()
     onClose()
 }
@@ -97,9 +104,9 @@ const inputStyle = 'p-2 border border-zinc-200 rounded-md flex-grow w-full'
                     </div>
                     {/* Url da Imagem */}
                     <div className="flex flex-col gap-1 col-span-2">
-                        <label htmlFor="imageUrl">Url da Imagem</label>
-                        <input type="text" className={inputStyle} id="imageUrl" placeholder="/placeholder.svg" {...register("imageURL")}/>
-                        {errors.imageURL && <span className="text-sm text-red-500">{errors.imageURL.message}</span>}
+                        <label htmlFor="image">Url da Imagem</label>
+                        <input type="text" className={inputStyle} id="image" placeholder="/placeholder.svg" {...register("image")}/>
+                        {errors.image && <span className="text-sm text-red-500">{errors.image.message}</span>}
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                         {/* Tempo de preparo */}
