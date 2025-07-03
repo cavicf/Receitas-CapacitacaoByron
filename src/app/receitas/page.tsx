@@ -5,7 +5,7 @@ import RecipeCard from "@/components/RecipeCard";
 import RecipeFormModal from "@/components/RecipeFormModal";
 import { recipes as initialRecipes } from "@/lib/data";
 import type {Recipe} from "@/lib/data"
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 
 export default function ReceitasPage(){
@@ -14,6 +14,12 @@ export default function ReceitasPage(){
     const [modalMode, setModalMode] = useState<'create'|'edit'>('create')
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe|undefined>(undefined)
     const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useState(false)
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filterRecipes = recipes.filter((recipe) =>
+        recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleOpenDeleteConfirmationModal = (recipe: Recipe) => {
         setSelectedRecipe(recipe);
@@ -67,8 +73,12 @@ export default function ReceitasPage(){
                         Nova Receita 
                     </button>
                 </div>
+                <div className="relative w-full mt-6">
+                    <Search  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18}/>
+                    <input type="text" placeholder="Buscar por nome ou categoria..." value={searchTerm} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)} className="w-full py-1 border border-gra-100 rounded-sm px-10"/>
+                </div>
                 <div className="grid justify-center sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                    {recipes.map((recipe)=> (
+                    {filterRecipes.map((recipe)=> (
                         <RecipeCard key={recipe.id} recipe={recipe} onEdit={() => handleOpenEditModal(recipe)} onDelete={() => handleOpenDeleteConfirmationModal(recipe)}/>
                     ))}
                 </div>
