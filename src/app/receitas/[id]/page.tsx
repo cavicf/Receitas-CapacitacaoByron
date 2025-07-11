@@ -1,6 +1,5 @@
 import InfoPill from "@/components/infoPill";
 import PreparationStep from "@/components/PreparationStep";
-import { Recipe, recipes } from "@/lib/data";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

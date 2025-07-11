@@ -70,7 +70,8 @@ export default function ReceitasPage(){
                 setRecipes((prev) => [...prev, newRecipe])
             }else{
                 const updateRecipe = recipeData as Recipe
-                setRecipes((prev)=> prev.map((recipe) => (recipe.id === updateRecipe.id ? updateRecipe : recipe )))
+                const response = await api.put(`/recipes/${updateRecipe.id}`, updateRecipe)
+                setRecipes((prev)=> prev.map((recipe) => (recipe.id === updateRecipe.id ? response.data : recipe )))
             }
         handleCloseModal()
         } catch (error) {
