@@ -21,6 +21,21 @@ export default function RecipeCard({recipe, onEdit, onDelete}: RecipeCardProps){
         onDelete?.()
     }
 
+    let botoesEditarExcluir = null
+
+    if(onEdit || onDelete){
+        botoesEditarExcluir = (
+            <div className="flex gap-2">
+                <button type="button" onClick={(e) => handleEdit(e)} className="p-2 border border-gray-200 rounded-sm hover:bg-gray-200 transition-colors cursor-pointer">
+                    <Edit size={16}/>
+                </button>
+                <button type="button" onClick={(e) => handleDelete(e)} className="p-2 border border-gray-200 rounded-sm hover:bg-gray-200 transition-colors cursor-pointer">
+                    <Trash2 size={16}/>
+                </button>
+            </div>
+        )
+    }
+
     return (
         <Link href={`/receitas/${recipe.id}`}>
             <div className="border border-slate-200 rounded-xl w-3xs lg:w-full overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full">
@@ -41,14 +56,7 @@ export default function RecipeCard({recipe, onEdit, onDelete}: RecipeCardProps){
                         <span className="text-sm text-gray-500 rounded-sm bg-gray-200 px-2 py-1">
                             {recipe.category}
                         </span>
-                        <div className="flex gap-2">
-                            <button type="button" onClick={(e) => handleEdit(e)} className="p-2 border border-gray-200 rounded-sm hover:bg-gray-200 transition-colors cursor-pointer">
-                                <Edit size={16}/>
-                            </button>
-                            <button type="button" onClick={(e) => handleDelete(e)} className="p-2 border border-gray-200 rounded-sm hover:bg-gray-200 transition-colors cursor-pointer">
-                                <Trash2 size={16}/>
-                            </button>
-                        </div>
+                        {botoesEditarExcluir}
                     </div>
                 </div>
             </div>
