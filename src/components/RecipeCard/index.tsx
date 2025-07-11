@@ -6,24 +6,24 @@ import Link from "next/link";
 
 interface RecipeCardProps{
     recipe: Recipe
-    onEdit: () => void
-    onDelete: () => void
+    onEdit?: () => void
+    onDelete?: () => void
 }
 
 export default function RecipeCard({recipe, onEdit, onDelete}: RecipeCardProps){
     const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        onEdit()   
+        onEdit?.()   
     }
 
     const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        onDelete()
+        onDelete?.()
     }
 
     return (
         <Link href={`/receitas/${recipe.id}`}>
-            <div className="border border-slate-200 rounded-xl w-3xs lg:w-full overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div className="border border-slate-200 rounded-xl w-3xs lg:w-full overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full">
                 <div className="relative h-48 w-full">
                     <Image
                         src={recipe.image}
