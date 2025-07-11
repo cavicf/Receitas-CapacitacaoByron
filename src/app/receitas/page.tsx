@@ -62,18 +62,21 @@ export default function ReceitasPage(){
         setIsRecipeModalOpen(false)
     }
 
-    const handleSaveRecipe = (recipeData: Omit<Recipe, 'id'> | Recipe) => {
-        if(modalMode === 'create'){
-            const newRecipe: Recipe = {
-                ...recipeData,
-                id: (recipes.length+1).toString()
+    const handleSaveRecipe = async (recipeData: Omit<Recipe, 'id'> | Recipe) => {
+        try {
+            if(modalMode === 'create'){
+                const response = await api.post('/recipes', recipeData)
+                const newRecipe = response.data
+                setRecipes((prev) => [...prev, newRecipe])
+            }else{
+                const updateRecipe = recipeData as Recipe
+                setRecipes((prev)=> prev.map((recipe) => (recipe.id === updateRecipe.id ? updateRecipe : recipe )))
             }
-            setRecipes((prev)=>[...prev, newRecipe])
-        }else{
-            const updateRecipe = recipeData as Recipe
-            setRecipes((prev)=> prev.map((recipe) => (recipe.id === updateRecipe.id ? updateRecipe : recipe )))
+        handleCloseModal()
+        } catch (error) {
+            
         }
-        handleCloseModal()     
+        
     }
     return (
         <main className="flex-grow py-8">
@@ -100,4 +103,4 @@ export default function ReceitasPage(){
             <DeleteConfirmationModal isOpen={isDeleteConfirmationModalOpen} onClose={() => setIsDeleteConfirmationModalOpen(false)} onConfirm={handleDeleteRecipe} recipe={selectedRecipe}/>
         </main>
     );
-}
+}     
