@@ -1,18 +1,45 @@
+'use client'
 import InfoPill from "@/components/infoPill";
 import PreparationStep from "@/components/PreparationStep";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { Recipe } from "@/lib/data";
+import { notFound, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
 
-interface RecipePageProps{
-    params: {
-        id: string;
+
+export default function ReceitaPage(){
+    let {id} = useParams()
+    const [recipe, setRecipe] = useState<Recipe|null>(null)
+    const [loading, setLoading] = useState(true)
+    useEffect(()=>{
+        const fetchRecipe = async () => {
+            try {
+                const response = await api.get(`/recipes/${id}`)
+                setRecipe(response.data)
+            } catch (error) {
+                console.error("Erro ao requisitar receita", error)
+            } finally{
+                setLoading(false)
+            }
+        }
+        fetchRecipe()
+    }, [])
+    
+    if(loading){
+        return(
+            <main className="flex-grow py-8">
+                <div className="container mx-auto">
+                    <div className="flex justify-center">
+                        <p>Carregando receita...</p>
+                    </div>
+                </div>
+            </main>
+        )
     }
-}
 
-export default function ReceitaPage({params}: RecipePageProps){
-    const recipe = recipes.find((recipe) => recipe.id === params.id);
     if(!recipe){
         return notFound();
     }
@@ -51,7 +78,7 @@ export default function ReceitaPage({params}: RecipePageProps){
                                 <h2 className="text-xl font-bold mb-4">Ingredientes</h2>
                                 <ul className="list-disc list-inside space-y-2">
                                     {recipe.ingredients.map((ingredient)=>(
-                                        <li key={ingredient} className="marker:text-orange-500">{ingredient}</li>
+                                        <li key={ingredient.value} className="marker:text-orange-500">{ingredient.value}</li>
                                     ))}
                                 </ul>
                             </div>
@@ -59,7 +86,7 @@ export default function ReceitaPage({params}: RecipePageProps){
                                 <h2 className="text-xl font-bold mb-4">Modo de preparo</h2>
                                 <ol className="space-y-4">
                                     {recipe.instructions.map((instruction, index)=> (
-                                        <PreparationStep key={instruction} index={index + 1} description={instruction}/>
+                                        <PreparationStep key={instruction.value} index={index + 1} description={instruction.value}/>
                                     ))}
                                 </ol>
                             </div>
