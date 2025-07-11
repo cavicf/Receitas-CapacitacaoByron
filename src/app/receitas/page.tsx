@@ -3,18 +3,30 @@
 import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
 import RecipeCard from "@/components/RecipeCard";
 import RecipeFormModal from "@/components/RecipeFormModal";
-import { recipes as initialRecipes } from "@/lib/data";
+import api from "@/lib/api";
 import type {Recipe} from "@/lib/data"
 import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ReceitasPage(){
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false)
-    const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
+    const [recipes, setRecipes] = useState<Recipe[]>([])
     const [modalMode, setModalMode] = useState<'create'|'edit'>('create')
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe|undefined>(undefined)
     const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        const fetchRecipes = async () =>{
+            try {
+                const response = await api.get('/recipes');
+                setRecipes(response.data)
+            } catch (error) {
+                console.error('Erro ao requisitar as receitas: ', error)
+            }
+        }
+        fetchRecipes();
+    }, [])
 
     const filterRecipes = recipes.filter((recipe) =>
         recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,7 +66,7 @@ export default function ReceitasPage(){
         if(modalMode === 'create'){
             const newRecipe: Recipe = {
                 ...recipeData,
-                id: (initialRecipes.length+1).toString()
+                id: (recipes.length+1).toString()
             }
             setRecipes((prev)=>[...prev, newRecipe])
         }else{
