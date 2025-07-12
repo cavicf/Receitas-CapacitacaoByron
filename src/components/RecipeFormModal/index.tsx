@@ -2,7 +2,6 @@ import { RecipeFormData, recipeSchema } from "@/lib/formValidationSchemas/recipe
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Span } from "next/dist/trace";
 import { Recipe } from "@/lib/data";
 import { useEffect } from "react";
 
@@ -68,8 +67,8 @@ useEffect(() => {
     if (mode === 'edit' && recipe) {
         reset({
             ...recipe,
-            ingredients: recipe.ingredients.map((ing) => ({ value: ing })),
-            instructions: recipe.instructions.map((inst) => ({ value: inst }))
+            ingredients: recipe.ingredients.map((ing) => ({ value: ing.value})),
+            instructions: recipe.instructions.map((inst) => ({ value: inst.value }))
         })
     } else {
         reset(DEFAULT_VALUES)
@@ -78,13 +77,7 @@ useEffect(() => {
 
 
 const onSubmit = (data: RecipeFormData) => {
-    const recipeData = {
-        ...data,
-        ingredients: data.ingredients.map((ingredient) => ingredient.value),
-        instructions: data.instructions.map((instructions) => instructions.value)
-    }
-    console.log(recipeData)
-    onSave(mode === 'edit' && recipe ? {...recipeData, id: recipe.id} : recipeData)
+    onSave(mode === 'edit' && recipe ? {...data, id: recipe.id} : data)
     reset()
     onClose()
 }
