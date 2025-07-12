@@ -3,18 +3,32 @@
 import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
 import RecipeCard from "@/components/RecipeCard";
 import RecipeFormModal from "@/components/RecipeFormModal";
-import { recipes as initialRecipes } from "@/lib/data";
+import api from "@/lib/api";
 import type {Recipe} from "@/lib/data"
 import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner"
 
 export default function ReceitasPage(){
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false)
-    const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
+    const [recipes, setRecipes] = useState<Recipe[]>([])
     const [modalMode, setModalMode] = useState<'create'|'edit'>('create')
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe|undefined>(undefined)
     const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        const fetchRecipes = async () =>{
+            try {
+                const response = await api.get('/recipes');
+                setRecipes(response.data)
+            } catch (error) {
+                console.error('Erro ao requisitar as receitas: ', error)
+                toast.error('Erro ao requisitar receitas, tente novamente mais tarde!')
+            }
+        }
+        fetchRecipes();
+    }, [])
 
     const filterRecipes = recipes.filter((recipe) =>
         recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -26,12 +40,20 @@ export default function ReceitasPage(){
         setIsDeleteConfirmationModalOpen(true)
     }
     
-    const handleDeleteRecipe = () => {
-        if(selectedRecipe){
-            setRecipes((prev) => prev.filter((recipe)=> recipe.id !== selectedRecipe.id))
-            setIsDeleteConfirmationModalOpen(false)
-            setSelectedRecipe(undefined)
+    const handleDeleteRecipe = async () => {
+        try {
+            if(selectedRecipe){
+                await api.delete(`/recipes/${selectedRecipe.id}`)
+                setRecipes((prev) => prev.filter((recipe)=> recipe.id !== selectedRecipe.id))
+                setIsDeleteConfirmationModalOpen(false)
+                setSelectedRecipe(undefined)
+            }
+            toast.success('Receita excluida com sucesso!')
+        } catch (error) {
+            console.error('erro ao deletar receita', error)
+            toast.error('Erro ao deletar receita!')
         }
+        
     }
 
     const handleOpenCreateModal =() => {
@@ -50,18 +72,26 @@ export default function ReceitasPage(){
         setIsRecipeModalOpen(false)
     }
 
-    const handleSaveRecipe = (recipeData: Omit<Recipe, 'id'> | Recipe) => {
-        if(modalMode === 'create'){
-            const newRecipe: Recipe = {
-                ...recipeData,
-                id: (initialRecipes.length+1).toString()
+    const handleSaveRecipe = async (recipeData: Omit<Recipe, 'id'> | Recipe) => {
+        try {
+            if(modalMode === 'create'){
+                const response = await api.post('/recipes', recipeData)
+                const newRecipe = response.data
+                setRecipes((prev) => [...prev, newRecipe])
+                toast.success('Receita criada com sucesso!')
+            }else{
+                const updateRecipe = recipeData as Recipe
+                const response = await api.put(`/recipes/${updateRecipe.id}`, updateRecipe)
+                setRecipes((prev)=> prev.map((recipe) => (recipe.id === updateRecipe.id ? response.data : recipe )))
+                toast.success('Receita editada com sucesso!')
             }
-            setRecipes((prev)=>[...prev, newRecipe])
-        }else{
-            const updateRecipe = recipeData as Recipe
-            setRecipes((prev)=> prev.map((recipe) => (recipe.id === updateRecipe.id ? updateRecipe : recipe )))
+        handleCloseModal()
+        
+        } catch (error) {
+            console.error(`Erro ao ${modalMode==="create" ? 'create' : 'editar'} a receita`, error)
+            toast.error(`Erro ao ${modalMode==="create" ? 'create' : 'editar'} a receita`)
         }
-        handleCloseModal()     
+        
     }
     return (
         <main className="flex-grow py-8">
@@ -88,4 +118,4 @@ export default function ReceitasPage(){
             <DeleteConfirmationModal isOpen={isDeleteConfirmationModalOpen} onClose={() => setIsDeleteConfirmationModalOpen(false)} onConfirm={handleDeleteRecipe} recipe={selectedRecipe}/>
         </main>
     );
-}
+}     
